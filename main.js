@@ -7,7 +7,7 @@ const robot = require("@jitsi/robotjs");
 const { socket } = require("./io");
 
 let mainWindow;
-
+let isSet = false;
 socket.on("connect", () => {
   console.log("connect");
   socket.on("ready", async () => {
@@ -23,13 +23,9 @@ socket.on("connect", () => {
 
 protocol.registerSchemesAsPrivileged([
   {
-    scheme: "app",
+    scheme: "electron-playground-code",
     privileges: {
-      standard: true,
       bypassCSP: true,
-      supportFetchAPI: true,
-      corsEnabled: true,
-      stream: true,
     },
   },
 ]);
@@ -92,7 +88,7 @@ function getStream() {
 }
 
 app.whenReady().then(() => {
-  protocol.handle("app", (req) => {
+  protocol.handle("electron-playground-code", (req) => {
     console.log("req", req);
   });
 });
@@ -113,6 +109,18 @@ app.on("ready", () => {
     console.log("Received parameters:", params);
     // 在这里处理传递过来的参数
   });
+  app.removeAsDefaultProtocolClient("electron-playground-code");
+
+  if (process.env.NODE_ENV === "development" && process.platform === "win32") {
+    isSet = app.setAsDefaultProtocolClient(
+      "electron-playground-code",
+      process.execPath,
+      [path.resolve(process.argv[1])]
+    );
+  } else {
+    isSet = app.setAsDefaultProtocolClient("electron-playground-code");
+  }
+  console.log("isSet", isSet);
 });
 
 app.on("activate", () => {
