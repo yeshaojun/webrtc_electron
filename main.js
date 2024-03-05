@@ -1,9 +1,10 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, protocol } = require("electron");
 const { desktopCapturer, ipcMain } = require("electron");
 const path = require("path");
-const robot = require("robotjs");
-const io = require("socket.io-client");
-const socket = io.connect("http://localhost:3000");
+const url = require("url");
+const querystring = require("querystring");
+const robot = require("@jitsi/robotjs");
+const { socket } = require("./io");
 
 let mainWindow;
 
@@ -12,18 +13,32 @@ socket.on("connect", () => {
   socket.on("ready", async () => {
     console.log("ready");
     try {
-      // 1.拿到stream
+      // 1.拿到stream]
+      getStream();
     } catch (error) {
       console.log("Error:", error);
     }
   });
 });
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "app",
+    privileges: {
+      standard: true,
+      bypassCSP: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      stream: true,
+    },
+  },
+]);
+
 function createWindow() {
   mainWindow = new BrowserWindow({
-    show: true, // 不显示窗口
-    width: 800,
-    height: 600,
+    show: false, // 不显示窗口
+    // width: 800,
+    // height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
@@ -38,17 +53,24 @@ function createWindow() {
     app.quit();
   });
 
-  getStream();
-
   ipcMain.on("scroll", (e, { x, y }) => {
     console.log("x", x, y);
     robot.scrollMouse(x, y);
   });
+
+  ipcMain.on("click", (e, { x, y }) => {
+    robot.moveMouse(x, y);
+    robot.mouseClick();
+  });
+
+  // ipcMain.on("stream", (e, stream) => {
+  //   console.log("stream", stream);
+  //   socket.emit("stream", stream);
+  // });
 }
 
 function getStream() {
   desktopCapturer.getSources({ types: ["screen"] }).then(async (sources) => {
-    console.log("sources", sources);
     try {
       mainWindow.webContents.send("SET_SOURCE", sources[0].id);
 
@@ -69,6 +91,12 @@ function getStream() {
   });
 }
 
+app.whenReady().then(() => {
+  protocol.handle("app", (req) => {
+    console.log("req", req);
+  });
+});
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
@@ -77,6 +105,14 @@ app.on("window-all-closed", () => {
 
 app.on("ready", () => {
   createWindow();
+  app.on("open-url", (event, appUrl) => {
+    event.preventDefault(); // 防止默认行为
+    const parsedUrl = url.parse(appUrl);
+    console.log("appUrl", appUrl, parsedUrl);
+    const params = querystring.parse(parsedUrl.query); // 解析参数
+    console.log("Received parameters:", params);
+    // 在这里处理传递过来的参数
+  });
 });
 
 app.on("activate", () => {
