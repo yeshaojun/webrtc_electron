@@ -1,0 +1,41 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn add electron -D
+
+PATH: 
+  /Library/Frameworks/Python.framework/Versions/3.8/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  20.11.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error [ERR_TLS_CERT_ALTNAME_INVALID]: Hostname/IP does not match certificate's altnames: Host: registry.taobao.org. is not in the cert's altnames: DNS:*.tbcdn.cn, DNS:*.taobao.com, DNS:*.alicdn.com, DNS:*.cmos.greencompute.org, DNS:cmos.greencompute.org, DNS:m.intl.taobao.com, DNS:*.mobgslb.tbcache.com, DNS:*.alikunlun.com, DNS:alikunlun.com, DNS:*.django.t.taobao.com, DNS:alicdn.com, DNS:*.tbcache.com, DNS:*.tmall.com, DNS:*.1688.com, DNS:*.3c.tmall.com, DNS:*.alibaba.com, DNS:*.aliexpress.com, DNS:*.aliqin.tmall.com, DNS:*.alitrip.com, DNS:*.aliyun.com, DNS:*.cainiao.com, DNS:*.cainiao.com.cn, DNS:*.chi.taobao.com, DNS:*.chi.tmall.com, DNS:*.china.taobao.com, DNS:*.dingtalk.com, DNS:*.etao.com, DNS:*.feizhu.cn, DNS:*.feizhu.com, DNS:*.fliggy.com, DNS:*.fliggy.hk, DNS:*.food.tmall.com, DNS:*.jia.taobao.com, DNS:*.jia.tmall.com, DNS:*.ju.taobao.com, DNS:*.juhuasuan.com, DNS:*.lw.aliimg.com, DNS:*.m.1688.com, DNS:*.m.alibaba.com, DNS:*.m.alitrip.com, DNS:*.m.cainiao.com, DNS:*.m.etao.com, DNS:*.m.taobao.com, DNS:*.m.taopiaopiao.com, DNS:*.m.tmall.com, DNS:*.m.tmall.hk, DNS:*.mei.com, DNS:*.taopiaopiao.com, DNS:*.tmall.hk, DNS:*.trip.taobao.com, DNS:*.xiami.com, DNS:1688.com, DNS:alibaba.com, DNS:aliexpress.com, DNS:alitrip.com, DNS:aliyun.com, DNS:cainiao.com, DNS:cainiao.com.cn, DNS:dingtalk.com, DNS:etao.com, DNS:feizhu.cn, DNS:feizhu.com, DNS:fliggy.com, DNS:fliggy.hk, DNS:juhuasuan.com, DNS:mei.com, DNS:taobao.com, DNS:taopiaopiao.com, DNS:tmall.hk, DNS:xiami.com, DNS:tmall.com, DNS:*.cloudvideocdn.taobao.com, DNS:cloudvideocdn.taobao.com, DNS:tbcdn.cn
+      at Object.checkServerIdentity (node:tls:337:12)
+      at TLSSocket.onConnectSecure (node:_tls_wrap:1684:27)
+      at TLSSocket.emit (node:events:518:28)
+      at TLSSocket._finishInit (node:_tls_wrap:1085:8)
+      at ssl.onhandshakedone (node:_tls_wrap:871:12)
+
+npm manifest: 
+  {
+    "name": "remote-electron",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
