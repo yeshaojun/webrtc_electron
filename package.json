@@ -1,6 +1,6 @@
 {
   "name": "remote-electron",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -12,11 +12,12 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^29.1.0",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "electron-log": "^5.1.1"
   },
   "build": {
-    "productName": "得力坐席辅助",
-    "appId": "deli",
+    "productName": "得力远程",
+    "appId": "deli-remote",
     "asar": false,
     "compression": "store",
     "dmg": {
@@ -57,7 +58,6 @@
   },
   "dependencies": {
     "@jitsi/robotjs": "^0.6.13",
-    "robotjs": "^0.6.0",
     "socket.io-client": "^4.7.4"
   }
 }

@@ -4,6 +4,7 @@ const path = require("path");
 const url = require("url");
 const querystring = require("querystring");
 const robot = require("@jitsi/robotjs");
+const log = require("electron-log");
 const { socket } = require("./io");
 
 let mainWindow;
@@ -20,21 +21,20 @@ socket.on("connect", () => {
     }
   });
 });
-
+log.info("create");
 protocol.registerSchemesAsPrivileged([
   {
-    scheme: "electron-playground-code",
+    scheme: "remote",
     privileges: {
       bypassCSP: true,
     },
   },
 ]);
-
 function createWindow() {
   mainWindow = new BrowserWindow({
-    show: false, // 不显示窗口
-    // width: 800,
-    // height: 600,
+    show: true, // 不显示窗口
+    width: 800,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
@@ -88,8 +88,8 @@ function getStream() {
 }
 
 app.whenReady().then(() => {
-  protocol.handle("electron-playground-code", (req) => {
-    console.log("req", req);
+  protocol.handle("remote", (req) => {
+    log.info("req", req);
   });
 });
 
@@ -99,26 +99,22 @@ app.on("window-all-closed", () => {
   }
 });
 
+app.on("open-url", (event, url) => {
+  event.preventDefault(); // 防止应用程序重启
+  const args = url.split("//")[1].split("/"); // 解析参数
+  log.info("log", args);
+});
+
 app.on("ready", () => {
   createWindow();
-  app.on("open-url", (event, appUrl) => {
-    event.preventDefault(); // 防止默认行为
-    const parsedUrl = url.parse(appUrl);
-    console.log("appUrl", appUrl, parsedUrl);
-    const params = querystring.parse(parsedUrl.query); // 解析参数
-    console.log("Received parameters:", params);
-    // 在这里处理传递过来的参数
-  });
-  app.removeAsDefaultProtocolClient("electron-playground-code");
+  app.removeAsDefaultProtocolClient("remote");
 
   if (process.env.NODE_ENV === "development" && process.platform === "win32") {
-    isSet = app.setAsDefaultProtocolClient(
-      "electron-playground-code",
-      process.execPath,
-      [path.resolve(process.argv[1])]
-    );
+    isSet = app.setAsDefaultProtocolClient("remote", process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
   } else {
-    isSet = app.setAsDefaultProtocolClient("electron-playground-code");
+    isSet = app.setAsDefaultProtocolClient("remote");
   }
   console.log("isSet", isSet);
 });

@@ -79,6 +79,10 @@ ipcRenderer.on("SET_SOURCE", async (event, sourceId) => {
   }
 });
 
+ipcRenderer.on("log", (event, message) => {
+  console.log(message);
+});
+
 function handleStream(stream) {
   console.log("222");
   const video = document.getElementById("localVideo");
