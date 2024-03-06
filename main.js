@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol } = require("electron");
+const { app, BrowserWindow, protocol, screen } = require("electron");
 const { desktopCapturer, ipcMain } = require("electron");
 const path = require("path");
 const url = require("url");
@@ -30,19 +30,29 @@ protocol.registerSchemesAsPrivileged([
     },
   },
 ]);
+
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    show: true, // 不显示窗口
-    width: 800,
-    height: 600,
+    // show: true, // 不显示窗口
+    width: 300,
+    height: 40,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    x: width / 2 - 50,
+    y: 0,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true, // 开启上下文隔离
       nodeIntegration: true,
     },
   });
 
+  // mainWindow.setIgnoreMouseEvents(true);
+  // mainWindow.setIgnoreMouseEvents(false);
+  // mainWindow.setIgnoreMouseEvents(true);
   mainWindow.loadFile("index.html");
-
   // 关闭窗口时退出应用
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -57,6 +67,10 @@ function createWindow() {
   ipcMain.on("click", (e, { x, y }) => {
     robot.moveMouse(x, y);
     robot.mouseClick();
+  });
+
+  ipcMain.on("close", (e, key) => {
+    app.quit();
   });
 
   // ipcMain.on("stream", (e, stream) => {
@@ -87,11 +101,12 @@ function getStream() {
   });
 }
 
-app.whenReady().then(() => {
-  protocol.handle("remote", (req) => {
-    log.info("req", req);
-  });
-});
+// app.whenReady().then(() => {
+//   protocol.handle("remote", (req) => {
+//     mainWindow && mainWindow.webContents.send("log", req);
+//     log.info("req", req);
+//   });
+// });
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -102,6 +117,8 @@ app.on("window-all-closed", () => {
 app.on("open-url", (event, url) => {
   event.preventDefault(); // 防止应用程序重启
   const args = url.split("//")[1].split("/"); // 解析参数
+  mainWindow && mainWindow.webContents.send("log", args);
+  // mainWindow.loadURL(`file://${__dirname}/index.html`);
   log.info("log", args);
 });
 

@@ -21,12 +21,44 @@ ipcRenderer.on("SET_SOURCE", async (event, sourceId) => {
     const peer = new RTCPeerConnection({
       iceServers: [
         {
-          urls: ["stun:stun.l.google.com:19302"],
+          urls: [
+            "stun:stun.l.google.com:19302",
+            "stun:stun1.l.google.com:19302",
+            "stun:stun2.l.google.com:19302",
+            "stun:stun3.l.google.com:19302",
+            "stun:stun.ekiga.net,",
+            "stun:stun.stunprotocol.org:3478",
+          ],
         },
         {
           urls: ["turn:wangxiang.website:3478"],
           username: "admin",
           credential: "admin",
+        },
+        {
+          urls: "turn:numb.viagenie.ca",
+          credential: "muazkh",
+          username: "webrtc@live.com",
+        },
+        {
+          urls: "turn:192.158.29.39:3478?transport=udp",
+          credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+          username: "28224511:1379330808",
+        },
+        {
+          urls: "turn:192.158.29.39:3478?transport=tcp",
+          credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+          username: "28224511:1379330808",
+        },
+        {
+          urls: "turn:turn.bistri.com:80",
+          credential: "homeo",
+          username: "homeo",
+        },
+        {
+          urls: "turn:turn.anyfirewall.com:443?transport=tcp",
+          credential: "webrtc",
+          username: "webrtc",
         },
       ],
     });
@@ -73,34 +105,30 @@ ipcRenderer.on("SET_SOURCE", async (event, sourceId) => {
     socket.emit("offer", offer);
 
     // socket.emit("stream", fs.createReadStream() stream);
-    handleStream(stream);
+    // handleStream(stream);
   } catch (e) {
     handleError(e);
   }
 });
 
 ipcRenderer.on("log", (event, message) => {
-  console.log(message);
+  console.log("log", message);
 });
 
-function handleStream(stream) {
-  console.log("222");
-  const video = document.getElementById("localVideo");
-  video.srcObject = stream;
-  video.onloadedmetadata = (e) => video.play();
-}
+// function handleStream(stream) {
+//   console.log("222");
+//   const video = document.getElementById("localVideo");
+//   video.srcObject = stream;
+//   video.onloadedmetadata = (e) => video.play();
+// }
 
 function handleError(e) {
   console.log(e);
 }
 
-// function listen() {
-//   document.addEventListener("wheel", (event) => {
-//     console.log("wheel");
-//     ipcRenderer.send("scroll", { x: event.clientX, y: event.clientY });
-//   });
-
-//   document.addEventListener("click", (event) => {
-//     ipcRenderer.send("click", { x: event.clientX, y: event.clientY });
-//   });
-// }
+window.addEventListener("DOMContentLoaded", () => {
+  // 获取按钮元素
+  document.getElementById("end-control").addEventListener("click", (event) => {
+    ipcRenderer.send("close");
+  });
+});

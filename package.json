@@ -6,14 +6,13 @@
   "scripts": {
     "dev": "electron .",
     "dist-mac": "rm -rf dist &&  electron-builder --mac --dir=outMac",
-    "dist-win": "electron-builder --win --x64"
+    "dist-win": "rm -rf dist &&  electron-builder --win --x64"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "electron": "^29.1.0",
-    "electron-builder": "^24.13.3",
-    "electron-log": "^5.1.1"
+    "electron-builder": "^24.13.3"
   },
   "build": {
     "productName": "得力远程",
@@ -58,6 +57,7 @@
   },
   "dependencies": {
     "@jitsi/robotjs": "^0.6.13",
+    "electron-log": "4.4.7",
     "socket.io-client": "^4.7.4"
   }
 }
