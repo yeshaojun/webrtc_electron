@@ -1,5 +1,5 @@
 const io = require("socket.io-client");
-const socket = io.connect("http://localhost:3000");
+const socket = io.connect("http:/119.3.88.210:39202");
 
 module.exports = {
   socket,

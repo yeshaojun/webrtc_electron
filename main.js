@@ -1,30 +1,16 @@
 const { app, BrowserWindow, protocol, screen } = require("electron");
 const { desktopCapturer, ipcMain } = require("electron");
 const path = require("path");
-const url = require("url");
-const querystring = require("querystring");
 const robot = require("@jitsi/robotjs");
 const log = require("electron-log");
-const { socket } = require("./io");
-
 let mainWindow;
 let isSet = false;
-socket.on("connect", () => {
-  console.log("connect");
-  socket.on("ready", async () => {
-    console.log("ready");
-    try {
-      // 1.拿到stream]
-      getStream();
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  });
-});
-log.info("create");
+
+const scheme = "remote";
+
 protocol.registerSchemesAsPrivileged([
   {
-    scheme: "remote",
+    scheme: scheme,
     privileges: {
       bypassCSP: true,
     },
@@ -44,7 +30,7 @@ function createWindow() {
     y: 0,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true, // 开启上下文隔离
+      // contextIsolation: true, // 开启上下文隔离
       nodeIntegration: true,
     },
   });
@@ -79,33 +65,24 @@ function createWindow() {
   // });
 }
 
-function getStream() {
+function getStream(params) {
   desktopCapturer.getSources({ types: ["screen"] }).then(async (sources) => {
     try {
-      mainWindow.webContents.send("SET_SOURCE", sources[0].id);
-
-      // const stream = await navigator.mediaDevices.getUserMedia({
-      //   audio: false,
-      //   video: {
-      //     mandatory: {
-      //       chromeMediaSource: "desktop",
-      //       chromeMediaSourceId: sources[0].id,
-      //       maxWidth: window.screen.width,
-      //       maxHeight: window.screen.height,
-      //     },
-      //   },
-      // });
+      console.log("getStream", sources);
+      mainWindow.webContents.send("SET_SOURCE", {
+        id: sources[0].id,
+        ...params,
+      });
     } catch (e) {
       console.error(e);
     }
   });
 }
 
-// app.whenReady().then(() => {
-//   protocol.handle("remote", (req) => {
-//     mainWindow && mainWindow.webContents.send("log", req);
-//     log.info("req", req);
-//   });
+// getStream({
+//   conversationId: "65ee680d59e637c25abe1dd7",
+//   userId: "1750709746761584642",
+//   staffId: "1742433838456963073",
 // });
 
 app.on("window-all-closed", () => {
@@ -115,23 +92,54 @@ app.on("window-all-closed", () => {
 });
 
 app.on("open-url", (event, url) => {
+  console.log("open-url");
   event.preventDefault(); // 防止应用程序重启
-  const args = url.split("//")[1].split("/"); // 解析参数
-  mainWindow && mainWindow.webContents.send("log", args);
-  // mainWindow.loadURL(`file://${__dirname}/index.html`);
-  log.info("log", args);
+  const obj = parseURLParams(url); // 解析参数
+  console.log("obj", obj);
+  if (obj.pathname) {
+    // const { socket } = require("./io");
+    getStream({
+      conversationId: obj.pathname,
+      userId: obj.params.userId,
+      staffId: obj.params.staffId,
+    });
+    // 启动就
+  }
 });
+
+function parseURLParams(url) {
+  const match = url.match(/^remote:\/\/([^?]+)(\?.+)?$/);
+  if (!match) {
+    throw new Error("Invalid URL format");
+  }
+
+  const pathname = match[1];
+  const searchParams = match[2] ? match[2].substring(1) : "";
+
+  const params = {};
+  if (searchParams) {
+    searchParams.split("&").forEach((param) => {
+      const [key, value] = param.split("=");
+      params[key] = decodeURIComponent(value);
+    });
+  }
+
+  return {
+    pathname: pathname,
+    params: params,
+  };
+}
 
 app.on("ready", () => {
   createWindow();
-  app.removeAsDefaultProtocolClient("remote");
+  app.removeAsDefaultProtocolClient(scheme);
 
   if (process.env.NODE_ENV === "development" && process.platform === "win32") {
-    isSet = app.setAsDefaultProtocolClient("remote", process.execPath, [
+    isSet = app.setAsDefaultProtocolClient(scheme, process.execPath, [
       path.resolve(process.argv[1]),
     ]);
   } else {
-    isSet = app.setAsDefaultProtocolClient("remote");
+    isSet = app.setAsDefaultProtocolClient(scheme);
   }
   console.log("isSet", isSet);
 });

@@ -1,6 +1,6 @@
 {
   "name": "remote-electron",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -15,8 +15,8 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "productName": "得力远程",
-    "appId": "deli-remote",
+    "productName": "远程",
+    "appId": "remote",
     "asar": false,
     "compression": "store",
     "dmg": {
