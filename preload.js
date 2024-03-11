@@ -1,6 +1,7 @@
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
-const { socket } = require("./io");
+const io = require("socket.io-client");
+const socket = io.connect("http://localhost:9000");
 
 const PEERCONFIG = {
   iceServers: [
@@ -15,7 +16,16 @@ const PEERCONFIG = {
   ],
 };
 
+socket.on("error", (err) => {
+  console.log("im error", err);
+});
+
+socket.on("connect", () => {
+  console.log("connect");
+});
+
 ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
+  console.log("SET_SOURCE", params);
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
@@ -30,7 +40,7 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         },
       },
     });
-
+    console.log("stream", stream);
     const peer = new RTCPeerConnection(PEERCONFIG);
     const channel = peer.createDataChannel("chat");
     channel.onopen = (e) => {
@@ -61,10 +71,7 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
       }
     };
 
-    socket.on("connect", async () => {
-      console.log("connect");
-      socket.emit("remoteJoin", params.conversationId);
-
+    socket.emit("remoteJoin", params.conversationId, async () => {
       socket.on("toUserCandidate", (candidate) => {
         console.log("toUserCandidate");
         peer.addIceCandidate(candidate);
