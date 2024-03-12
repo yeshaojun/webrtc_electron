@@ -35,10 +35,10 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         mandatory: {
           chromeMediaSource: "desktop",
           chromeMediaSourceId: id,
-          // minWidth: 1280,
-          // maxWidth: 1280,
-          // minHeight: 720,
-          // maxHeight: 720,
+          minWidth: 1280,
+          maxWidth: 1280,
+          minHeight: 720,
+          maxHeight: 720,
         },
       },
     });
@@ -67,6 +67,8 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         ipcRenderer.send("scroll", { x: eventData.x, y: eventData.y });
       } else if (eventData.type === "click") {
         ipcRenderer.send("click", { x: eventData.x, y: eventData.y });
+      } else if (eventData.type === "mousemove") {
+        ipcRenderer.send("mousemove", { x: eventData.x, y: eventData.y });
       }
     };
 

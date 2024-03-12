@@ -53,6 +53,10 @@ function createWindow() {
     robot.mouseClick();
   });
 
+  ipcMain.on("mousemove", (e, { x, y }) => {
+    robot.moveMouse(x, y);
+  });
+
   ipcMain.on("close", (e, key) => {
     app.quit();
   });
@@ -120,8 +124,8 @@ app.on("open-url", (event, url) => {
 
 function openUrlWindow(argv) {
   for (const arg of argv) {
-    if (arg.startsWith("myapp://")) {
-      const obj = parseURLParams(argv); // 解析参数
+    if (arg.startsWith("remote://")) {
+      const obj = parseURLParams(arg); // 解析参数
       if (obj.pathname) {
         getStream({
           conversationId: obj.pathname.replace("/", "").trim(),
