@@ -56,20 +56,18 @@ function createWindow() {
 
   ipcMain.on("keydown", (e, { key }) => {
     try {
-      robot.mouseToggle("down");
       robot.keyTap(key);
     } catch (error) {
       log.warn("keydown error", error);
     }
   });
 
-  ipcMain.on("keyup", (e, { key }) => {
-    try {
-      robot.mouseToggle("up");
-      robot.keyTap(key);
-    } catch (error) {
-      log.warn("keydown error", error);
-    }
+  ipcMain.on("mousedown", (e, { key }) => {
+    robot.mouseToggle("down");
+  });
+
+  ipcMain.on("mouseup", (e, { key }) => {
+    robot.mouseToggle("up");
   });
 
   ipcMain.on("mousemove", (e, { x, y }) => {

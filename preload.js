@@ -65,14 +65,14 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
       console.log("onmessage", e, eventData);
       if (eventData.type === "scroll") {
         ipcRenderer.send("scroll", { x: eventData.x, y: eventData.y });
-      } else if (eventData.type === "click") {
-        ipcRenderer.send("click", { x: eventData.x, y: eventData.y });
       } else if (eventData.type === "mousemove") {
         ipcRenderer.send("mousemove", { x: eventData.x, y: eventData.y });
       } else if (eventData.type === "keydown") {
         ipcRenderer.send("keydown", { key: eventData.key });
-      } else if (eventData.type === "keyup") {
-        ipcRenderer.send("keyup", { key: eventData.key });
+      } else if (eventData.type === "mousedown") {
+        ipcRenderer.send("mousedown", { key: eventData.key });
+      } else if (eventData.type === "mouseup") {
+        ipcRenderer.send("mousedown", { key: eventData.key });
       }
     };
 
