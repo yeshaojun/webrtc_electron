@@ -72,7 +72,7 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
       } else if (eventData.type === "mousedown") {
         ipcRenderer.send("mousedown", { key: eventData.key });
       } else if (eventData.type === "mouseup") {
-        ipcRenderer.send("mousedown", { key: eventData.key });
+        ipcRenderer.send("mouseup", { key: eventData.key });
       }
     };
 
