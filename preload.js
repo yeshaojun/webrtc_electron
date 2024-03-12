@@ -89,6 +89,7 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
     };
 
     socket.emit("remoteJoin", params.conversationId, async () => {
+      document.getElementById("tip").innerText = "正在进行远程控制";
       socket.on("toUserCandidate", (candidate) => {
         console.log("toUserCandidate");
         peer.addIceCandidate(candidate);

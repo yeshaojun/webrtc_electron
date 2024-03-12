@@ -56,7 +56,11 @@ function createWindow() {
   });
 
   ipcMain.on("keydown", (e, { key }) => {
-    robot.keyTap(key);
+    if (key === "Enter") {
+      robot.keyTap("\r");
+    } else {
+      robot.keyTap(key);
+    }
   });
 
   ipcMain.on("mousemove", (e, { x, y }) => {
