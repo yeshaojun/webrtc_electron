@@ -1,4 +1,4 @@
-const { ipcRenderer, dialog } = require("electron");
+const { ipcRenderer, dialog, screen } = require("electron");
 const fs = require("fs");
 const io = require("socket.io-client");
 const socket = io.connect("http://119.3.88.210:39202");

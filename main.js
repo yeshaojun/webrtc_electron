@@ -8,6 +8,8 @@ let mainWindow;
 let isSet = false;
 
 const scheme = "remote";
+let screenWidth = 0;
+let screenHeight = 0;
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -49,12 +51,12 @@ function createWindow() {
   });
 
   ipcMain.on("click", (e, { x, y }) => {
-    robot.moveMouse(x, y);
+    robot.moveMouse(x * (screenWidth / 720), y * (screenHeight / 1280));
     robot.mouseClick();
   });
 
   ipcMain.on("mousemove", (e, { x, y }) => {
-    robot.moveMouse(x, y);
+    robot.moveMouse(x * (screenWidth / 720), y * (screenHeight / 1280));
   });
 
   ipcMain.on("close", (e, key) => {
@@ -175,6 +177,10 @@ app.on("ready", () => {
   if (process.platform !== "darwin") {
     openUrlWindow(process.argv);
   }
+  const primaryDisplay = screen.getPrimaryDisplay();
+  screenWidth = primaryDisplay.size.width;
+  screenHeight = primaryDisplay.size.height;
+  console.log("primaryDisplay", primaryDisplay);
   console.log("isSet", isSet);
 });
 
