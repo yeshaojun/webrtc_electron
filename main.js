@@ -62,6 +62,14 @@ function createWindow() {
     }
   });
 
+  ipcMain.on("copy", (e, { key }) => {
+    robot.keyTap("c", ["control"]);
+  });
+
+  ipcMain.on("paste", (e, { key }) => {
+    robot.keyTap("v", ["control"]);
+  });
+
   ipcMain.on("mousedown", (e, { key }) => {
     robot.mouseToggle("down");
   });
