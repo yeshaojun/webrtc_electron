@@ -3,6 +3,7 @@ const { desktopCapturer, ipcMain } = require("electron");
 const path = require("path");
 const robot = require("@jitsi/robotjs");
 const log = require("electron-log");
+const gotTheLock = app.requestSingleInstanceLock();
 let mainWindow;
 let isSet = false;
 
@@ -35,9 +36,6 @@ function createWindow() {
     },
   });
 
-  // mainWindow.setIgnoreMouseEvents(true);
-  // mainWindow.setIgnoreMouseEvents(false);
-  // mainWindow.setIgnoreMouseEvents(true);
   mainWindow.loadFile("index.html");
   // 关闭窗口时退出应用
   mainWindow.on("closed", () => {
@@ -58,11 +56,6 @@ function createWindow() {
   ipcMain.on("close", (e, key) => {
     app.quit();
   });
-
-  // ipcMain.on("stream", (e, stream) => {
-  //   console.log("stream", stream);
-  //   socket.emit("stream", stream);
-  // });
 }
 
 function getStream(params) {
@@ -79,11 +72,29 @@ function getStream(params) {
   });
 }
 
-// getStream({
-//   conversationId: "65ee680d59e637c25abe1dd7",
-//   userId: "1750709746761584642",
-//   staffId: "1742433838456963073",
-// });
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    // 当第二个实例尝试启动时，发送消息给第一个实例
+    if (mainWindow) {
+      if (process.platform === "win32") {
+        // 在 Windows 上，处理命令行参数中的自定义协议启动
+        for (let i = 0; i < commandLine.length; i++) {
+          const arg = commandLine[i];
+          if (arg.startsWith("remote://")) {
+            // 处理参数逻辑
+            openUrlWindow(arg);
+            break;
+          }
+        }
+      }
+      // Bring the first instance's window to the front if it's minimized
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -106,6 +117,22 @@ app.on("open-url", (event, url) => {
     // 启动就
   }
 });
+
+function openUrlWindow(argv) {
+  for (const arg of argv) {
+    if (arg.startsWith("myapp://")) {
+      const obj = parseURLParams(argv); // 解析参数
+      if (obj.pathname) {
+        getStream({
+          conversationId: obj.pathname.replace("/", "").trim(),
+          userId: obj.params.userId,
+          staffId: obj.params.staffId,
+        });
+        // 启动就
+      }
+    }
+  }
+}
 
 function parseURLParams(url) {
   const match = url.match(/^remote:\/\/([^?]+)(\?.+)?$/);
@@ -140,6 +167,9 @@ app.on("ready", () => {
     ]);
   } else {
     isSet = app.setAsDefaultProtocolClient(scheme);
+  }
+  if (process.platform !== "darwin") {
+    openUrlWindow(process.argv);
   }
   console.log("isSet", isSet);
 });

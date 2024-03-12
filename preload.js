@@ -1,7 +1,7 @@
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, dialog } = require("electron");
 const fs = require("fs");
 const io = require("socket.io-client");
-const socket = io.connect("http://localhost:9000");
+const socket = io.connect("http://119.3.88.210:39202");
 
 const PEERCONFIG = {
   iceServers: [
@@ -15,6 +15,8 @@ const PEERCONFIG = {
     },
   ],
 };
+
+let conversationId = "";
 
 socket.on("error", (err) => {
   console.log("im error", err);
@@ -45,6 +47,17 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
     const channel = peer.createDataChannel("chat");
     channel.onopen = (e) => {
       console.log("onopen", e);
+    };
+    conversationId = params.conversationId;
+    peer.onconnectionstatechange = () => {
+      // console.log(peer.connectionState)
+      if (peer.connectionState === "disconnected") {
+        // dialog.showErrorBox("远程桌面已结束！", "");
+        socket.emit("remoteClose", {
+          conversationId: params.conversationId,
+        });
+        // ipcRenderer.send("close");
+      }
     };
 
     channel.onmessage = (e) => {
@@ -83,6 +96,11 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         await peer.setRemoteDescription(answer);
       });
 
+      socket.on("remoteClose", () => {
+        dialog.showErrorBox("远程桌面已结束！", "");
+        ipcRenderer.send("close");
+      });
+
       let offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
 
@@ -100,20 +118,14 @@ ipcRenderer.on("log", (event, message) => {
   console.log("log", message);
 });
 
-// function handleStream(stream) {
-//   console.log("222");
-//   const video = document.getElementById("localVideo");
-//   video.srcObject = stream;
-//   video.onloadedmetadata = (e) => video.play();
-// }
-
-function handleError(e) {
-  console.log(e);
-}
-
 window.addEventListener("DOMContentLoaded", () => {
   // 获取按钮元素
   document.getElementById("end-control").addEventListener("click", (event) => {
-    ipcRenderer.send("close");
+    socket.emit("remoteClose", {
+      conversationId,
+    });
+    setTimeout(() => {
+      ipcRenderer.send("close");
+    }, 1000);
   });
 });
