@@ -102,14 +102,7 @@ if (!gotTheLock) {
     if (mainWindow) {
       if (process.platform === "win32") {
         // 在 Windows 上，处理命令行参数中的自定义协议启动
-        for (let i = 0; i < commandLine.length; i++) {
-          const arg = commandLine[i];
-          if (arg.startsWith("remote://")) {
-            // 处理参数逻辑
-            openUrlWindow(arg);
-            break;
-          }
-        }
+        openUrlWindow(commandLine);
       }
       // Bring the first instance's window to the front if it's minimized
       if (mainWindow.isMinimized()) mainWindow.restore();
