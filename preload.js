@@ -75,7 +75,7 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         ipcRenderer.send("mouseup", { key: eventData.key });
       } else if (eventData.type === "copy") {
         ipcRenderer.send("copy", { key: eventData.key });
-      } else if (eventData.type === "mouseup") {
+      } else if (eventData.type === "paste") {
         ipcRenderer.send("paste", { key: eventData.key });
       }
     };
