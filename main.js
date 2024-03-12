@@ -46,7 +46,6 @@ function createWindow() {
   });
 
   ipcMain.on("scroll", (e, { x, y }) => {
-    console.log("x", x, y);
     robot.scrollMouse(x, y);
   });
 
@@ -56,10 +55,20 @@ function createWindow() {
   });
 
   ipcMain.on("keydown", (e, { key }) => {
-    if (key === "Enter") {
-      robot.keyTap("\r");
-    } else {
+    try {
+      robot.mouseToggle("down");
       robot.keyTap(key);
+    } catch (error) {
+      log.warn("keydown error", error);
+    }
+  });
+
+  ipcMain.on("keyup", (e, { key }) => {
+    try {
+      robot.mouseToggle("up");
+      robot.keyTap(key);
+    } catch (error) {
+      log.warn("keydown error", error);
     }
   });
 
@@ -75,7 +84,6 @@ function createWindow() {
 function getStream(params) {
   desktopCapturer.getSources({ types: ["screen"] }).then(async (sources) => {
     try {
-      console.log("getStream", sources);
       mainWindow.webContents.send("SET_SOURCE", {
         id: sources[0].id,
         ...params,
@@ -117,10 +125,8 @@ app.on("window-all-closed", () => {
 });
 
 app.on("open-url", (event, url) => {
-  console.log("open-url");
   event.preventDefault(); // 防止应用程序重启
   const obj = parseURLParams(url); // 解析参数
-  console.log("obj", obj);
   if (obj.pathname) {
     // const { socket } = require("./io");
     getStream({
@@ -188,8 +194,6 @@ app.on("ready", () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   screenWidth = primaryDisplay.size.width;
   screenHeight = primaryDisplay.size.height;
-  console.log("primaryDisplay", primaryDisplay);
-  console.log("isSet", isSet);
 });
 
 app.on("activate", () => {

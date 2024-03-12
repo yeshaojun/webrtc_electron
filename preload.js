@@ -52,7 +52,7 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
     peer.onconnectionstatechange = () => {
       // console.log(peer.connectionState)
       if (peer.connectionState === "disconnected") {
-        // dialog.showErrorBox("远程桌面已结束！", "");
+        dialog.showErrorBox("远程桌面已结束！", "");
         socket.emit("remoteClose", {
           conversationId: params.conversationId,
         });
@@ -71,6 +71,8 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         ipcRenderer.send("mousemove", { x: eventData.x, y: eventData.y });
       } else if (eventData.type === "keydown") {
         ipcRenderer.send("keydown", { key: eventData.key });
+      } else if (eventData.type === "keyup") {
+        ipcRenderer.send("keyup", { key: eventData.key });
       }
     };
 
@@ -118,10 +120,6 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
   } catch (e) {
     console.log("error111", JSON.stringify(e.message));
   }
-});
-
-ipcRenderer.on("log", (event, message) => {
-  console.log("log", message);
 });
 
 window.addEventListener("DOMContentLoaded", () => {
