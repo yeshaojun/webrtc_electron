@@ -51,12 +51,16 @@ function createWindow() {
   });
 
   ipcMain.on("click", (e, { x, y }) => {
-    robot.moveMouse(x * (screenWidth / 720), y * (screenHeight / 1280));
+    robot.moveMouse(x * (screenWidth / 1280), y * (screenHeight / 720));
     robot.mouseClick();
   });
 
+  ipcMain.on("keydown", (e, { key }) => {
+    robot.keyTap(key);
+  });
+
   ipcMain.on("mousemove", (e, { x, y }) => {
-    robot.moveMouse(x * (screenWidth / 720), y * (screenHeight / 1280));
+    robot.moveMouse(x * (screenWidth / 1280), y * (screenHeight / 720));
   });
 
   ipcMain.on("close", (e, key) => {

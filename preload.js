@@ -2,7 +2,7 @@ const { ipcRenderer, dialog, screen } = require("electron");
 const fs = require("fs");
 const io = require("socket.io-client");
 const socket = io.connect("http://119.3.88.210:39202");
-
+const log = require("electron-log");
 const PEERCONFIG = {
   iceServers: [
     {
@@ -69,6 +69,8 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
         ipcRenderer.send("click", { x: eventData.x, y: eventData.y });
       } else if (eventData.type === "mousemove") {
         ipcRenderer.send("mousemove", { x: eventData.x, y: eventData.y });
+      } else if (eventData.type === "keydown") {
+        ipcRenderer.send("keydown", { key: eventData.key });
       }
     };
 
@@ -99,7 +101,8 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
       });
 
       socket.on("remoteClose", () => {
-        dialog.showErrorBox("远程桌面已结束！", "");
+        log.info("remoteClose");
+        // dialog.showErrorBox("远程桌面已结束！", "");
         ipcRenderer.send("close");
       });
 
