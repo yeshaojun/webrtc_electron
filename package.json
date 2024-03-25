@@ -1,6 +1,6 @@
 {
   "name": "remote-electron",
-  "version": "1.0.5",
+  "version": "1.0.1",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^29.1.0",
+    "electron-log": "4.4.7",
     "electron-builder": "^24.13.3",
     "electron-rebuild": "^3.2.9"
   },
@@ -56,9 +57,11 @@
       "allowElevation": true
     }
   },
+  "files": [
+    "!node_modules"
+  ],
   "dependencies": {
     "@jitsi/robotjs": "^0.6.13",
-    "electron-log": "4.4.7",
     "socket.io-client": "^4.7.4"
   }
 }

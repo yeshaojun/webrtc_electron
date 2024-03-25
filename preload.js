@@ -1,7 +1,7 @@
 const { ipcRenderer, dialog, screen } = require("electron");
 const fs = require("fs");
 const io = require("socket.io-client");
-const socket = io.connect("http://119.3.88.210:39202");
+const socket = io.connect("http://localhost:3000");
 const log = require("electron-log");
 const PEERCONFIG = {
   iceServers: [
@@ -62,7 +62,6 @@ ipcRenderer.on("SET_SOURCE", async (event, { id, ...params }) => {
 
     channel.onmessage = (e) => {
       var eventData = JSON.parse(e.data);
-      console.log("onmessage", e, eventData);
       if (eventData.type === "scroll") {
         ipcRenderer.send("scroll", { x: eventData.x, y: eventData.y });
       } else if (eventData.type === "mousemove") {
